@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng build && node ./bin/www",
     "build": "ng build --prod",
     "test": "ng test",
     "lint": "ng lint",
@@ -20,9 +20,14 @@
     "@angular/http": "^5.2.0",
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
-    "@angular/router": "^5.2.0",
+    "@angular/router": "^5.2.5",
+    "@types/rx": "^4.1.1",
+    "body-parser": "^1.18.2",
     "core-js": "^2.4.1",
+    "express": "^4.16.2",
+    "morgan": "^1.9.0",
     "rxjs": "^5.5.6",
+    "serve-favicon": "^2.4.5",
     "zone.js": "^0.8.19"
   },
   "devDependencies": {
@@ -40,6 +45,7 @@
     "karma-coverage-istanbul-reporter": "^1.2.1",
     "karma-jasmine": "~1.1.0",
     "karma-jasmine-html-reporter": "^0.2.2",
+    "nodemon": "^1.15.1",
     "protractor": "~5.1.2",
     "ts-node": "~4.1.0",
     "tslint": "~5.9.1",

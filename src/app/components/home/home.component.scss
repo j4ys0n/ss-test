@@ -1,0 +1,48 @@
+.home-wrapper {
+  padding: 25px;
+}
+
+.bids-book,
+.asks-book {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.bids-book {
+  margin-right: 50px;
+}
+
+ul {
+  padding: 0;
+}
+
+li {
+  list-style-type: none;
+  margin-bottom: 3px;
+
+  &.overlap {
+    background-color: #424c55;
+  }
+}
+
+.order-col {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+
+  &.number {
+    width: 40%;
+  }
+
+  &.label {
+    width: 16%;
+  }
+
+  &.bid {
+    color: #70a800;
+  }
+
+  &.ask {
+    color: #ea0070;
+  }
+}

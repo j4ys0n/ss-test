@@ -1,18 +1,26 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { HttpModule } from '@angular/http';
 
-
-import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app.routing';
+// components
+import { RootComponent } from './components/root/root.component';
+import { HomeComponent } from './components/home/home.component';
+// services
+import { ApiService } from './services/api/api.service';
 
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
   imports: [
-    BrowserModule
+    AppRoutingModule,
+    BrowserModule,
+    HttpModule
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  declarations: [
+    RootComponent,
+    HomeComponent
+  ],
+  providers: [ApiService],
+  bootstrap: [RootComponent]
 })
 export class AppModule { }

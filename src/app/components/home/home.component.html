@@ -1,0 +1,38 @@
+<div class="home-wrapper">
+  <h1>
+    Combined Order Book for ETH/BTC
+  </h1>
+  <p>Bittrex, Poloniex, Gemini</p>
+  <div class="order-books">
+    <div class="bids-book">
+      <h2>Bids</h2>
+      <ul class="bids-list">
+        <li>
+          <span class="order-col header number">Price</span>
+          <span class="order-col header number">Amount</span>
+          <span class="order-col header label">Origin</span>
+        </li>
+        <li *ngFor="let bid of bids" [class.overlap]="bid.overlap">
+          <span class="order-col bid number">{{ bid.rate }}</span>
+          <span class="order-col number">{{ bid.quantity }}</span>
+          <span class="order-col label">{{ bid.origin }}</span>
+        </li>
+      </ul>
+    </div>
+    <div class="asks-book">
+      <h2>Asks</h2>
+      <ul class="asks-list">
+        <li>
+          <span class="order-col header number">Price</span>
+          <span class="order-col header number">Amount</span>
+          <span class="order-col header label">Origin</span>
+        </li>
+        <li *ngFor="let ask of asks" [class.overlap]="ask.overlap">
+          <span class="order-col ask number">{{ ask.rate }}</span>
+          <span class="order-col number">{{ ask.quantity }}</span>
+          <span class="order-col label">{{ ask.origin }}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
