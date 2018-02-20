@@ -1,8 +1,17 @@
 <div class="home-wrapper">
   <h1>
-    Combined Order Book for ETH/BTC
+    Combined Order Book
   </h1>
   <p>Bittrex, Poloniex, Gemini</p>
+  <div>
+    <mat-select [(value)]="market1">
+      <mat-option value="btc">BTC</mat-option>
+    </mat-select>
+    <mat-select [(value)]="market2" (selectionChange)="updateMarkets()">
+      <mat-option value="eth">ETH</mat-option>
+      <mat-option value="ltc">LTC</mat-option>
+    </mat-select>
+  </div>
   <div class="order-books">
     <div class="bids-book">
       <h2>Bids</h2>

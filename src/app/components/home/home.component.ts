@@ -1,13 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
 import { forkJoin } from 'rxjs/observable/forkJoin';
+import { timer } from 'rxjs/observable/timer';
 import { ApiService } from './../../services/api/api.service';
+import { UtilsService } from './../../services/utils/utils.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
+
+  market1 = 'btc';
+  market2 = 'eth';
 
   bidsBittrex: Array<any>;
   asksBittrex: Array<any>
@@ -23,47 +29,102 @@ export class HomeComponent implements OnInit {
   asks: Array<any>;
 
   fixed = 8;
+  apiTimer: Observable<any>;
+  timerInterval = 5000;
+  apis: any;
 
-  constructor(private apiService: ApiService) { }
+  bittrex: Observable<any>;
+  poloniex: Observable<any>;
+  gemini: Observable<any>;
+
+  live = true;
+
+  constructor(
+    private apiService: ApiService,
+    private utilsService: UtilsService
+  ) { }
 
   ngOnInit() {
-    let bittrex = this.apiService.getData('/api/bittrex/btceth');
-    let poloniex = this.apiService.getData('/api/poloniex/btceth');
-    let gemini = this.apiService.getData('/api/gemini/btceth');
 
-    forkJoin([bittrex, poloniex, gemini]).subscribe(results => {
-      this.bidsBittrex = results[0].result.buy.map(this.bittrexMap);
-      this.asksBittrex = results[0].result.sell.map(this.bittrexMap);
-      this.bidsPoloniex = results[1].bids.map(this.poloniexMap);
-      this.asksPoloniex = results[1].asks.map(this.poloniexMap);
-      this.bidsGemini = results[2].bids.map(this.geminiMap);
-      this.asksGemini = results[2].asks.map(this.geminiMap);
 
-      this.bids = this.mergeSort(this.bidsBittrex.concat(this.bidsPoloniex).concat(this.bidsGemini));
-      this.asks = this.mergeSort(this.asksBittrex.concat(this.asksPoloniex).concat(this.asksGemini));
+    this.bittrex = this.apiService.getData('/api/bittrex/' + this.market1 + '/' + this.market2);
+    this.poloniex = this.apiService.getData('/api/poloniex/' + this.market1 + '/' + this.market2);
+    // this.gemini = this.apiService.getData('/api/gemini/' + this.market1 + '/' + this.market2);
+    this.subscribeToMarkets();
 
-      this.bidsCombined += this.combine(this.bids);
-      this.asksCombined += this.combine(this.asks);
+  }
 
-      this.checkCombine(this.bids); //TODO remove
-      this.checkCombine(this.asks); //TODO remove
+  updateMarkets() {
+    console.log(this.market2);
+    this.unsubscribe();
+    this.bittrex = this.apiService.getData('/api/bittrex/' + this.market1 + '/' + this.market2);
+    this.poloniex = this.apiService.getData('/api/poloniex/' + this.market1 + '/' + this.market2);
+    // this.gemini = this.apiService.getData('/api/gemini/' + this.market1 + '/' + this.market2);
+    this.subscribeToMarkets();
+  }
 
-      this.bids = this.bids.map(this.trimMap);
-      this.asks = this.asks.map(this.trimMap);
-      console.log('bids(' + this.bidsCombined + ')', this.bids);
-      console.log('asks(' + this.asksCombined + ')', this.asks);
+  subscribeToMarkets() {
+    this.apiTimer = timer(0, this.timerInterval);
+    this.apiTimer.subscribe(() => {
+      this.apis = forkJoin([this.bittrex, this.poloniex]);
+      this.apis
+      .subscribe(results => {
+        // normalize api responses
+        this.bidsBittrex = results[0].result.buy.map(this.bittrexMap);
+        this.asksBittrex = results[0].result.sell.map(this.bittrexMap);
+        this.bidsPoloniex = results[1].bids.map(this.poloniexMap);
+        this.asksPoloniex = results[1].asks.map(this.poloniexMap);
+        // console.log(results[2]);
+        // this.bidsGemini = results[2].bids.map(this.geminiMap);
+        // this.asksGemini = results[2].asks.map(this.geminiMap);
+
+        // sort merged json
+        this.bids = this.utilsService.mergeSort(this.bidsBittrex.concat(this.bidsPoloniex));
+        this.asks = this.utilsService.mergeSort(this.asksBittrex.concat(this.asksPoloniex));
+
+        // combine and count overlapping bids & asks
+        this.bidsCombined = this.utilsService.combine(this.bids, this.updateItem);
+        this.asksCombined = this.utilsService.combine(this.asks, this.updateItem);
+
+        // double check that all overlapping bids and asks were combined - needed?
+        this.utilsService.checkCombine(this.bids);
+        this.utilsService.checkCombine(this.asks);
+
+        // some numbers are too long, need to trim them
+        this.bids = this.bids.map(this.trimMap);
+        this.asks = this.asks.map(this.trimMap);
+
+        //TODO remove, debugging
+        // console.log('bids(' + this.bidsCombined + ')', this.bids);
+        // console.log('asks(' + this.asksCombined + ')', this.asks);
+      });
     });
+  }
 
+  updateItem(item, nextItem) {
+    if(item['overlap']) {
+      item['original'].push({quantity: nextItem.quantity, origin: nextItem.origin});
+    } else {
+      item['original'] = [
+        {quantity: item.quantity, origin: item.origin},
+        {quantity: nextItem.quantity, origin: nextItem.origin}
+      ];
+    }
+    item['overlap'] = true;
+    item.origin = 'mixed';
+    item.quantity += nextItem.quantity;
+
+    return item;
   }
 
   trimMap(item) {
     if (item.quantity.toString().length > 10) {
       item.quantity = parseFloat(item.quantity.toString().substr(0,10));
-      item['qTrimmed'] = true;
+      item['qTrimmed'] = true; // more for error checking than anything
     }
     if (item.rate.toString().length > 10) {
       item.rate = parseFloat(item.rate.toString().substr(0,10));
-      item['rTrimmed'] = true;
+      item['rTrimmed'] = true; // more for error checking than anything
     }
     return item;
   }
@@ -92,78 +153,12 @@ export class HomeComponent implements OnInit {
     };
   }
 
-  updateItem(item, nextItem) {
-    if(item['overlap']) {
-      item['original'].push({quantity: nextItem.quantity, origin: nextItem.origin});
-      console.log('third');
-    } else {
-      item['original'] = [
-        {quantity: item.quantity, origin: item.origin},
-        {quantity: nextItem.quantity, origin: nextItem.origin}
-      ]
-    }
-    item['overlap'] = true;
-    item.origin = 'mixed';
-    item.quantity += nextItem.quantity;
-
-    return item;
+  unsubscribe() {
+    // this.apiTimer.unsubscribe();
+    // this.apis.unsubscribe();
   }
 
-  combine(arr): number {
-    let len = arr.length;
-    let count = 0;
-    for (let i = 0; i < len; i++) {
-      if (i !== len - 1) {
-        if (arr[i].rate === arr[i+1].rate) {
-          arr[i] = this.updateItem(arr[i], arr[i+1]);
-          arr.splice(i+1, 1);
-          count++;
-          i--; // stay in place, check next
-        }
-      }
-      len = arr.length;
-    }
-    return count;
+  ngOnDestroy() {
+    this.unsubscribe();
   }
-
-  checkCombine(arr) {
-    let len = arr.length;
-    for (let i = 0; i < len; i++) {
-      if (i !== len - 1) {
-        if (arr[i].rate === arr[i+1].rate) {
-          console.warn('MISSED', arr[i], arr[i+1]);
-        }
-      }
-    }
-  }
-
-  merge(left, right, arr) {
-  	let a=0;
-
-  	while (left.length && right.length)
-  		arr[a++] = right[0].rate < left[0].rate ? right.shift() : left.shift();
-
-  	while (left.length) arr[a++]=left.shift();
-  	while (right.length) arr[a++]=right.shift();
-
-    return arr;
-  }
-
-  mSort(arr, tmp, l) {
-  	if(l==1) return;
-
-  	let m = Math.floor(l/2),
-  		tmp_l = tmp.slice(0,m),
-  		tmp_r = tmp.slice(m);
-
-    this.mSort(tmp_l, arr.slice(0,m), m);
-    this.mSort(tmp_r, arr.slice(m), l-m);
-
-  	return this.merge(tmp_l, tmp_r, arr);
-  }
-
-  mergeSort(arr){
-  	return this.mSort(arr, arr.slice(), arr.length);
-  }
-
 }

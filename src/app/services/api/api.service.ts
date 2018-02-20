@@ -6,6 +6,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/toPromise';
 
 import { Observable } from 'rxjs/Observable';
+import { _throw } from 'rxjs/observable/throw';
 import { environment } from './../../../environments/environment';
 
 @Injectable()
@@ -27,7 +28,7 @@ export class ApiService {
   private handleError(error: any) {
     const msg = (error.message) ? error.message : error.status ? `${error.status} - ${error.statusText}` : 'Server error';
     console.error(msg);
-    return Observable.throw(msg); // TODO is .throw real?
+    return _throw(msg); // TODO is .throw real?
   }
 
 }
