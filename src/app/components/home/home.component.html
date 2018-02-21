@@ -2,12 +2,17 @@
   <h1>
     Combined Order Book
   </h1>
-  <p>Bittrex, Poloniex, Gemini</p>
-  <div>
-    <mat-select [(value)]="market1">
+  <mat-button-toggle-group multiple class="exchange-toggles">
+    <mat-button-toggle [checked]="enableBittrex" (change)="toggleBittrex()">Bittrex</mat-button-toggle>
+    <mat-button-toggle [checked]="enablePoloniex" (change)="togglePoloniex()">Poloniex</mat-button-toggle>
+    <mat-button-toggle [checked]="enableGDAX" (change)="toggleGDAX()">GDAX</mat-button-toggle>
+    <mat-button-toggle [checked]="enableCryptopia" (change)="toggleCryptopia()">Cryptopia</mat-button-toggle>
+  </mat-button-toggle-group>
+  <div class="market-select">
+    <mat-select class="pair-select" [(value)]="market1">
       <mat-option value="btc">BTC</mat-option>
     </mat-select>
-    <mat-select [(value)]="market2" (selectionChange)="updateMarkets()">
+    <mat-select class="pair-select" [(value)]="market2" (selectionChange)="updateMarkets()">
       <mat-option value="eth">ETH</mat-option>
       <mat-option value="ltc">LTC</mat-option>
     </mat-select>

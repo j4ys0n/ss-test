@@ -4,7 +4,10 @@ import { NgModule } from '@angular/core';
 import { HttpModule } from '@angular/http';
 
 //angular material
-import { MatSelectModule } from '@angular/material';
+import {
+  MatSelectModule,
+  MatButtonToggleModule
+} from '@angular/material';
 
 import { AppRoutingModule } from './app.routing';
 // components
@@ -16,7 +19,8 @@ import { UtilsService } from './services/utils/utils.service';
 
 @NgModule({
   exports: [
-    MatSelectModule
+    MatSelectModule,
+    MatButtonToggleModule
   ]
 })
 export class AppMaterialModule {}
