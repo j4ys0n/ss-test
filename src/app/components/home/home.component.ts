@@ -4,6 +4,13 @@ import { forkJoin } from 'rxjs/observable/forkJoin';
 import { timer } from 'rxjs/observable/timer';
 import { ApiService } from './../../services/api/api.service';
 import { UtilsService } from './../../services/utils/utils.service';
+import {
+  NormalizedDataInterface,
+  BittrexInterface,
+  PoloniexInterface,
+  GDAXInterface,
+  CryptopiaInterface
+} from './../../interfaces/market-interfaces';
 
 @Component({
   selector: 'app-home',
@@ -20,20 +27,20 @@ export class HomeComponent implements OnInit, OnDestroy {
   enableGDAX = true;
   enableCryptopia = false;
 
-  bidsBittrex: Array<any>;
-  asksBittrex: Array<any>
-  bidsPoloniex: Array<any>;
-  asksPoloniex: Array<any>;
-  bidsGdax: Array<any>;
-  asksGdax: Array<any>;
-  bidsCrypt: Array<any>;
-  asksCrypt: Array<any>;
+  bidsBittrex: Array<NormalizedDataInterface>;
+  asksBittrex: Array<NormalizedDataInterface>
+  bidsPoloniex: Array<NormalizedDataInterface>;
+  asksPoloniex: Array<NormalizedDataInterface>;
+  bidsGdax: Array<NormalizedDataInterface>;
+  asksGdax: Array<NormalizedDataInterface>;
+  bidsCrypt: Array<NormalizedDataInterface>;
+  asksCrypt: Array<NormalizedDataInterface>;
 
   bidsCombined = 0;
   asksCombined = 0;
 
-  bids: Array<any>;
-  asks: Array<any>;
+  bids: Array<NormalizedDataInterface>;
+  asks: Array<NormalizedDataInterface>;
 
   fixed = 8;
   apiTimer: Observable<any>;
@@ -42,12 +49,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   apis: any;
   apiDisposeable: any;
 
-  bittrex: Observable<any>;
-  poloniex: Observable<any>;
-  gdax: Observable<any>;
-  cryptopia: Observable<any>;
+  bittrex: Observable<BittrexInterface>;
+  poloniex: Observable<PoloniexInterface>;
+  gdax: Observable<GDAXInterface>;
+  cryptopia: Observable<CryptopiaInterface>;
 
-  resultsCache: any;
+  resultsCache: Array<any>;
 
   subscribed = false;
 
