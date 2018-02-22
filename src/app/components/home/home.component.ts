@@ -37,8 +37,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   fixed = 8;
   apiTimer: Observable<any>;
+  apiTimerDisposeable: any;
   timerInterval = 5000;
   apis: any;
+  apiDisposeable: any;
 
   bittrex: Observable<any>;
   poloniex: Observable<any>;
@@ -46,6 +48,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   cryptopia: Observable<any>;
 
   resultsCache: any;
+
+  subscribed = false;
 
   constructor(
     private apiService: ApiService,
@@ -77,12 +81,16 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   updateMarkets() {
-    // this.unsubscribe();
+    if (this.subscribed) {
+      this.unsubscribe();
+    }
+
     this.bittrex = this.apiService.getData('/api/bittrex/' + this.market1 + '/' + this.market2);
     this.poloniex = this.apiService.getData('/api/poloniex/' + this.market1 + '/' + this.market2);
     this.gdax = this.apiService.getData('/api/gdax/' + this.market1 + '/' + this.market2);
     this.cryptopia = this.apiService.getData('/api/cryptopia/' + this.market1 + '/' + this.market2);
     this.subscribeToMarkets();
+    this.subscribed = true;
   }
 
   updateData(results) {
@@ -93,8 +101,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.asksPoloniex = this.enablePoloniex ? results[1].asks.map(this.utilsService.poloniexMap) : [];
     this.bidsGdax = this.enableGDAX ? results[2].bids.map(this.utilsService.gdaxMap) : [];
     this.asksGdax = this.enableGDAX ? results[2].asks.map(this.utilsService.gdaxMap) : [];
-    this.bidsCrypt = this.enableCryptopia ? results[3].Data.Sell.map(this.utilsService.cryptopiaMap) : [];
-    this.asksCrypt = this.enableCryptopia ? results[3].Data.Buy.map(this.utilsService.cryptopiaMap) : [];
+    this.bidsCrypt = this.enableCryptopia ? results[3].Data.Buy.map(this.utilsService.cryptopiaMap) : [];
+    this.asksCrypt = this.enableCryptopia ? results[3].Data.Sell.map(this.utilsService.cryptopiaMap) : [];
 
     // sort merged json
     this.bids = this.utilsService.mergeSort(
@@ -112,7 +120,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.bidsCombined = this.utilsService.combine(this.bids);
     this.asksCombined = this.utilsService.combine(this.asks);
 
-    // double check that all overlapping bids and asks were combined - needed?
+    // double check that all overlapping bids and asks were combined - needed here?
     this.utilsService.checkCombine(this.bids);
     this.utilsService.checkCombine(this.asks);
 
@@ -127,13 +135,13 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   subscribeToMarkets() {
     this.apiTimer = timer(0, this.timerInterval);
-    this.apiTimer.subscribe(() => {
+    this.apiTimerDisposeable = this.apiTimer.subscribe(() => {
       this.apis = forkJoin([
         this.bittrex,
         this.poloniex,
         this.gdax,
         this.cryptopia]);
-      this.apis.subscribe(results => {
+      this.apiDisposeable = this.apis.subscribe(results => {
         this.resultsCache = results;
         this.updateData(results);
       });
@@ -153,8 +161,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   unsubscribe() {
-    // this.apiTimer.unsubscribe();
-    // this.apis.unsubscribe();
+    this.apiDisposeable.unsubscribe();
+    this.apiTimerDisposeable.unsubscribe();
   }
 
   ngOnDestroy() {
