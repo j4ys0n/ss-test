@@ -87,14 +87,14 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   updateData(results) {
     // normalize api responses
-    this.bidsBittrex = this.enableBittrex ? results[0].result.buy.map(this.bittrexMap) : [];
-    this.asksBittrex = this.enableBittrex ? results[0].result.sell.map(this.bittrexMap) : [];
-    this.bidsPoloniex = this.enablePoloniex ? results[1].bids.map(this.poloniexMap) : [];
-    this.asksPoloniex = this.enablePoloniex ? results[1].asks.map(this.poloniexMap) : [];
-    this.bidsGdax = this.enableGDAX ? results[2].bids.map(this.gdaxMap) : [];
-    this.asksGdax = this.enableGDAX ? results[2].asks.map(this.gdaxMap) : [];
-    this.bidsCrypt = this.enableCryptopia ? results[3].Data.Sell.map(this.cryptopiaMap) : [];
-    this.asksCrypt = this.enableCryptopia ? results[3].Data.Buy.map(this.cryptopiaMap) : [];
+    this.bidsBittrex = this.enableBittrex ? results[0].result.buy.map(this.utilsService.bittrexMap) : [];
+    this.asksBittrex = this.enableBittrex ? results[0].result.sell.map(this.utilsService.bittrexMap) : [];
+    this.bidsPoloniex = this.enablePoloniex ? results[1].bids.map(this.utilsService.poloniexMap) : [];
+    this.asksPoloniex = this.enablePoloniex ? results[1].asks.map(this.utilsService.poloniexMap) : [];
+    this.bidsGdax = this.enableGDAX ? results[2].bids.map(this.utilsService.gdaxMap) : [];
+    this.asksGdax = this.enableGDAX ? results[2].asks.map(this.utilsService.gdaxMap) : [];
+    this.bidsCrypt = this.enableCryptopia ? results[3].Data.Sell.map(this.utilsService.cryptopiaMap) : [];
+    this.asksCrypt = this.enableCryptopia ? results[3].Data.Buy.map(this.utilsService.cryptopiaMap) : [];
 
     // sort merged json
     this.bids = this.utilsService.mergeSort(
@@ -109,8 +109,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       .concat(this.asksCrypt));
 
     // combine and count overlapping bids & asks
-    this.bidsCombined = this.utilsService.combine(this.bids, this.updateItem);
-    this.asksCombined = this.utilsService.combine(this.asks, this.updateItem);
+    this.bidsCombined = this.utilsService.combine(this.bids);
+    this.asksCombined = this.utilsService.combine(this.asks);
 
     // double check that all overlapping bids and asks were combined - needed?
     this.utilsService.checkCombine(this.bids);
@@ -140,22 +140,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  updateItem(item, nextItem) {
-    if(item['overlap']) {
-      item['original'].push({quantity: nextItem.quantity, origin: nextItem.origin});
-    } else {
-      item['original'] = [
-        {quantity: item.quantity, origin: item.origin},
-        {quantity: nextItem.quantity, origin: nextItem.origin}
-      ];
-    }
-    item['overlap'] = true;
-    item.origin = 'mixed';
-    item.quantity += nextItem.quantity;
-
-    return item;
-  }
-
   trimMap(item) {
     if (item.quantity.toString().length > 10) {
       item.quantity = parseFloat(item.quantity.toString().substr(0,10));
@@ -166,46 +150,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       item['rTrimmed'] = true; // more for error checking than anything
     }
     return item;
-  }
-
-  bittrexMap(item) {
-    return {
-      quantity: item.Quantity,
-      rate: item.Rate,
-      origin: 'bittrex'
-    };
-  }
-
-  poloniexMap(arr) {
-    return {
-      quantity: arr[1],
-      rate: parseFloat(arr[0]),
-      origin: 'poloniex'
-    };
-  }
-
-  geminiMap(item) {
-    return {
-      quantity: parseFloat(item.amount),
-      rate: parseFloat(item.price),
-      origin: 'gemini'
-    };
-  }
-
-  gdaxMap(arr) {
-    return {
-      quantity: parseFloat(arr[1]),
-      rate: parseFloat(arr[0]),
-      origin: 'gdax'
-    };
-  }
-
-  cryptopiaMap(item) {
-    return {
-      quantity: item.Volume,
-      rate: item.Price,
-      origin: 'cryptopia'
-    };
   }
 
   unsubscribe() {

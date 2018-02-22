@@ -5,13 +5,29 @@ export class UtilsService {
 
   constructor() { }
 
-  combine(arr, updateFcn): number {
+  updateItem(item, nextItem) {
+    if(item['overlap']) {
+      item['original'].push({quantity: nextItem.quantity, origin: nextItem.origin});
+    } else {
+      item['original'] = [
+        {quantity: item.quantity, origin: item.origin},
+        {quantity: nextItem.quantity, origin: nextItem.origin}
+      ];
+    }
+    item['overlap'] = true;
+    item.origin = 'mixed';
+    item.quantity += nextItem.quantity;
+
+    return item;
+  }
+
+  combine(arr): number {
     let len = arr.length;
     let count = 0;
     for (let i = 0; i < len; i++) {
       if (i !== len - 1) {
         if (arr[i].rate === arr[i+1].rate) {
-          arr[i] = updateFcn(arr[i], arr[i+1]);
+          arr[i] = this.updateItem(arr[i], arr[i+1]);
           arr.splice(i+1, 1);
           count++;
           i--; // stay in place, check next
@@ -28,9 +44,11 @@ export class UtilsService {
       if (i !== len - 1) {
         if (arr[i].rate === arr[i+1].rate) {
           console.warn('MISSED', arr[i], arr[i+1]);
+          return false;
         }
       }
     }
+    return true;
   }
 
   merge(left, right, arr) {
@@ -60,6 +78,46 @@ export class UtilsService {
 
   mergeSort(arr){
   	return this.mSort(arr, arr.slice(), arr.length);
+  }
+
+  bittrexMap(item) {
+    return {
+      quantity: item.Quantity,
+      rate: item.Rate,
+      origin: 'bittrex'
+    };
+  }
+
+  poloniexMap(arr) {
+    return {
+      quantity: arr[1],
+      rate: parseFloat(arr[0]),
+      origin: 'poloniex'
+    };
+  }
+
+  geminiMap(item) {
+    return {
+      quantity: parseFloat(item.amount),
+      rate: parseFloat(item.price),
+      origin: 'gemini'
+    };
+  }
+
+  gdaxMap(arr) {
+    return {
+      quantity: parseFloat(arr[1]),
+      rate: parseFloat(arr[0]),
+      origin: 'gdax'
+    };
+  }
+
+  cryptopiaMap(item) {
+    return {
+      quantity: item.Volume,
+      rate: item.Price,
+      origin: 'cryptopia'
+    };
   }
 
 }
