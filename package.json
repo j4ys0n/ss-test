@@ -5,7 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng build && node ./bin/www",
-    "build": "ng build --prod && node ./bin/www",
+    "build": "ng build --prod && forever start ./bin/www",
     "test": "ng test",
     "lint": "ng lint"
   },

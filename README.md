@@ -16,6 +16,10 @@ Run `npm start` for a dev server. Navigate to `http://localhost:3000/`.
 
 ## Build
 
+You may need:
+
+`npm install -g forever`
+
 Run `sudo PORT=80 npm run-script build` to build the project.
 
 ## Running unit tests
