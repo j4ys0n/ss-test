@@ -22,6 +22,10 @@ You may need:
 
 Run `sudo PORT=80 npm run-script build` to build the project.
 
+To stop:
+
+`sudo forever stop ./bin/www`
+
 ## Running unit tests
 
 Run `npm test` to execute the unit tests via [Karma](https://karma-runner.github.io).
