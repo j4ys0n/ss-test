@@ -5,12 +5,12 @@
   "scripts": {
     "ng": "ng",
     "start": "ng build && node ./bin/www",
-    "build": "ng build --prod",
+    "build": "ng build --prod && node ./bin/www",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
-  "private": true,
+  "private": false,
   "dependencies": {
     "@angular/animations": "^5.2.0",
     "@angular/cdk": "^5.2.1",

@@ -4,6 +4,5 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 
 export const environment = {
-  production: false,
-  api_bittrex: 'https://bittrex.com/api/v1.1/public'
+  production: false
 };

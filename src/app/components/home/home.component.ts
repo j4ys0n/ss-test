@@ -28,7 +28,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   enableCryptopia = false;
 
   bidsBittrex: Array<NormalizedDataInterface>;
-  asksBittrex: Array<NormalizedDataInterface>
+  asksBittrex: Array<NormalizedDataInterface>;
   bidsPoloniex: Array<NormalizedDataInterface>;
   asksPoloniex: Array<NormalizedDataInterface>;
   bidsGdax: Array<NormalizedDataInterface>;
@@ -135,7 +135,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.bids = this.bids.map(this.trimMap);
     this.asks = this.asks.map(this.trimMap);
 
-    //TODO remove, debugging
+    // TODO remove, debugging
     // console.log('bids(' + this.bidsCombined + ')', this.bids);
     // console.log('asks(' + this.asksCombined + ')', this.asks);
   }
@@ -157,11 +157,11 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   trimMap(item) {
     if (item.quantity.toString().length > 10) {
-      item.quantity = parseFloat(item.quantity.toString().substr(0,10));
+      item.quantity = parseFloat(item.quantity.toString().substr(0, 10));
       item['qTrimmed'] = true; // more for error checking than anything
     }
     if (item.rate.toString().length > 10) {
-      item.rate = parseFloat(item.rate.toString().substr(0,10));
+      item.rate = parseFloat(item.rate.toString().substr(0, 10));
       item['rTrimmed'] = true; // more for error checking than anything
     }
     return item;

@@ -81,8 +81,7 @@ describe('UtilsService', () => {
   }));
 
   it('should normalize, merge and sort data', inject([UtilsService], (service: UtilsService) => {
-    //tests
-    //normalize
+    // normalize
     const bidsOne = dummyOne.result.buy.map(service.bittrexMap);
     const asksOne = dummyOne.result.sell.map(service.bittrexMap);
     const bidsTwo = dummyTwo.bids.map(service.poloniexMap);
@@ -92,7 +91,7 @@ describe('UtilsService', () => {
     const bidsFour = dummyFour.Data.Buy.map(service.cryptopiaMap);
     const asksFour = dummyFour.Data.Sell.map(service.cryptopiaMap);
 
-    //merge and sort
+    // merge and sort
     const bids = service.mergeSort(
       bidsOne
       .concat(bidsTwo)
@@ -106,11 +105,11 @@ describe('UtilsService', () => {
       .concat(asksFour)
     );
 
-    //add overlapping bids
+    // add overlapping bids
     const bidsCombined = service.combine(bids);
     const asksCombined = service.combine(asks);
 
-    //tests
+    // tests
     expect(bidsOne).toEqual(dummyOneBidsNormalized);
     expect(bidsTwo).toEqual(dummyTwoBidsNormalized);
     expect(bidsThree).toEqual(dummyThreeBidsNormalized);

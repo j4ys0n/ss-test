@@ -4,7 +4,7 @@ import { NgModule } from '@angular/core';
 import { HttpModule } from '@angular/http';
 import { HttpClientModule } from '@angular/common/http';
 
-//angular material
+// angular material
 import {
   MatSelectModule,
   MatButtonToggleModule
