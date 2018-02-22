@@ -1,5 +1,5 @@
 {
-  "name": "ss-test",
+  "name": "test",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
@@ -7,8 +7,7 @@
     "start": "ng build && node ./bin/www",
     "build": "ng build --prod && node ./bin/www",
     "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
+    "lint": "ng lint"
   },
   "private": false,
   "dependencies": {
@@ -28,6 +27,7 @@
     "core-js": "^2.4.1",
     "express": "^4.16.2",
     "morgan": "^1.9.0",
+    "node-sass": "^4.7.2",
     "rxjs": "^5.5.6",
     "serve-favicon": "^2.4.5",
     "zone.js": "^0.8.19"
